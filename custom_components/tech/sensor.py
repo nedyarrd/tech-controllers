@@ -1,7 +1,6 @@
 """Support for Tech HVAC system."""
 import itertools
 import logging
-from config.custom_components.tech.tech import Tech
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import TEMP_CELSIUS, PERCENTAGE
@@ -18,7 +17,7 @@ async def async_setup_entry(
 ) -> None:
     """Set up entry."""
     _LOGGER.debug("Setting up sensor entry, module udid: %s", config_entry.data["udid"])
-    api: Tech = hass.data[DOMAIN][config_entry.entry_id]
+    api = hass.data[DOMAIN][config_entry.entry_id]
     zones = await api.get_module_zones(config_entry.data["udid"])
 
     battery_devices = map_to_battery_sensors(zones, api, config_entry)
