@@ -8,7 +8,7 @@ from homeassistant.components.climate.const import (
     CURRENT_HVAC_HEAT,
     CURRENT_HVAC_IDLE,
     CURRENT_HVAC_OFF,
-    ClimateEntityFeature,
+    SUPPORT_TARGET_TEMPERATURE
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from .const import DOMAIN
@@ -83,7 +83,7 @@ class TechThermostat(ClimateEntity):
     @property
     def supported_features(self):
         """Return the list of supported features."""
-        return ClimateEntityFeature.TARGET_TEMPERATURE #| SUPPORT_PRESET_MODE
+        return SUPPORT_TARGET_TEMPERATURE #| SUPPORT_PRESET_MODE
 
     @property
     def hvac_mode(self):

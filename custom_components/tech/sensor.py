@@ -30,16 +30,14 @@ async def async_setup_entry(
     )
 
 def map_to_battery_sensors(zones, api, config_entry):
-    for deviceIndex in zones:
-        _LOGGER.info("Device %s is battery opperated: %s", deviceIndex, zones[deviceIndex]['zone']['batteryLevel'])
     devices = filter(lambda deviceIndex: is_battery_operating_device(zones[deviceIndex]), zones)
-    return list(map(lambda deviceIndex: TechBatterySensor(zones[deviceIndex], api, config_entry), devices))
+    return map(lambda deviceIndex: TechBatterySensor(zones[deviceIndex], api, config_entry), devices)
 
 def is_battery_operating_device(device) -> bool:
     return device['zone']['batteryLevel'] is not None
 
 def map_to_temperature_sensors(zones, api, config_entry):
-    return list(map(lambda deviceIndex: TechTemperatureSensor(zones[deviceIndex], api, config_entry), zones))
+    return map(lambda deviceIndex: TechTemperatureSensor(zones[deviceIndex], api, config_entry), zones)
 
 class TechBatterySensor(SensorEntity):
     """Representation of a Tech battery sensor."""
