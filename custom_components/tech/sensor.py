@@ -22,9 +22,11 @@ async def async_setup_entry(
 
     battery_devices = map_to_battery_sensors(zones, api, config_entry)
     temperature_sensors = map_to_temperature_sensors(zones, api, config_entry)
+    humidity_sensors = map_to_humidity_sensors(zones, api, config_entry)
+
 
     async_add_entities(
-        itertools.chain(battery_devices, temperature_sensors),
+        itertools.chain(battery_devices, temperature_sensors,humidity_sensors),
         True,
     )
 
@@ -37,6 +39,9 @@ def is_battery_operating_device(device) -> bool:
 
 def map_to_temperature_sensors(zones, api, config_entry):
     return map(lambda deviceIndex: TechTemperatureSensor(zones[deviceIndex], api, config_entry), zones)
+
+def map_to_humidity_sensors(zones, api, config_entry):
+    return map(lambda deviceIndex: TechHumiditySensor(zones[deviceIndex], api, config_entry), zones)
 
 class TechBatterySensor(SensorEntity):
     """Representation of a Tech battery sensor."""
@@ -114,6 +119,49 @@ class TechTemperatureSensor(SensorEntity):
         """Call by the Tech device callback to update state."""
         _LOGGER.debug(
             "Updating Tech temp. sensor: %s, udid: %s, id: %s",
+            self._name,
+            self._config_entry.data["udid"],
+            self._id,
+        )
+        device = await self._api.get_zone(self._config_entry.data["udid"], self._id)
+        self.update_properties(device)
+
+class TechHumiditySensor(SensorEntity):
+    """Representation of a Tech humidity sensor."""
+    
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_device_class = SensorDeviceClass.HUMIDITY
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, device, api, config_entry):
+        """Initialize the Tech humidity sensor."""
+        _LOGGER.debug("Init TechHumiditySensor... ")
+        self._config_entry = config_entry
+        self._api = api
+        self._id = device["zone"]["id"]
+        self.update_properties(device)
+
+    def update_properties(self, device):
+        self._name = device["description"]["name"]
+        if device["zone"]["humidity"] is not None:
+            self._attr_native_value =  device["zone"]["humidity"]
+        else:
+            self._attr_native_value = None
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique ID."""
+        return "{}_humidity".format(self._id)
+
+    @property
+    def name(self):
+        """Return the name of the device."""
+        return "{} humidity".format(self._name)
+
+    async def async_update(self):
+        """Call by the Tech device callback to update state."""
+        _LOGGER.debug(
+            "Updating Tech hum. sensor: %s, udid: %s, id: %s",
             self._name,
             self._config_entry.data["udid"],
             self._id,
