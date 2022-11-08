@@ -38,10 +38,15 @@ def is_battery_operating_device(device) -> bool:
     return device['zone']['batteryLevel'] is not None
 
 def map_to_temperature_sensors(zones, api, config_entry):
+    devices = filter(lambda deviceIndex: is_humidity_operating_device(zones[deviceIndex]), zones)
     return map(lambda deviceIndex: TechTemperatureSensor(zones[deviceIndex], api, config_entry), zones)
 
 def map_to_humidity_sensors(zones, api, config_entry):
-    return map(lambda deviceIndex: TechHumiditySensor(zones[deviceIndex], api, config_entry), zones)
+    devices = filter(lambda deviceIndex: is_humidity_operating_device(zones[deviceIndex]), zones)
+    return map(lambda deviceIndex: TechHumiditySensor(zones[deviceIndex], api, config_entry), devices)
+
+def is_humidity_operating_device(device) -> bool:
+    return device['zone']['humidity'] != 0
 
 class TechBatterySensor(SensorEntity):
     """Representation of a Tech battery sensor."""
