@@ -65,7 +65,7 @@ class TechBatterySensor(SensorEntity):
     @property
     def unique_id(self) -> str:
         """Return a unique ID."""
-        return "{}_battery".format(self._id)
+        return "climate_{}_battery".format(self._id)
 
     @property
     def name(self):
@@ -108,7 +108,7 @@ class TechTemperatureSensor(SensorEntity):
     @property
     def unique_id(self) -> str:
         """Return a unique ID."""
-        return "{}_temperature".format(self._id)
+        return "climate_{}_temperature".format(self._id)
 
     @property
     def name(self):
@@ -143,7 +143,7 @@ class TechHumiditySensor(SensorEntity):
 
     def update_properties(self, device):
         self._name = device["description"]["name"]
-        if device["zone"]["humidity"] is not None:
+        if device["zone"]["humidity"] != 0:
             self._attr_native_value =  device["zone"]["humidity"]
         else:
             self._attr_native_value = None
@@ -151,7 +151,7 @@ class TechHumiditySensor(SensorEntity):
     @property
     def unique_id(self) -> str:
         """Return a unique ID."""
-        return "{}_humidity".format(self._id)
+        return "climate_{}_humidity".format(self._id)
 
     @property
     def name(self):
