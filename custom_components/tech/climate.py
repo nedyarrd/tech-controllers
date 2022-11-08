@@ -57,6 +57,13 @@ class TechThermostat(ClimateEntity):
             self._temperature =  device["zone"]["currentTemperature"] / 10
         else:
             self._temperature = None
+
+        if device["zone"]["humidity"] is not None:
+            self._humidity =  device["zone"]["humidity"]
+            _LOGGER.debug("Tech THermostat found humidity: %d",self._humidity)
+        else:
+            self._humidity = None
+    
         state = device["zone"]["flags"]["relayState"]
         if state == "on":
             self._state = CURRENT_HVAC_HEAT
@@ -125,6 +132,11 @@ class TechThermostat(ClimateEntity):
         """Return the current temperature."""
         return self._temperature
 
+    @property
+    def current_humidity(self):
+        """Return the current humidity."""
+        return self._humidity
+    
     @property
     def target_temperature(self):
         """Return the temperature we try to reach."""
