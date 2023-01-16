@@ -91,6 +91,20 @@ class Tech:
             raise TechError(401, "Unauthorized")
         return result
 
+    async def get_module_tiles(self, module_udid):
+        async with self.update_lock:
+            now = time.time()
+            _LOGGER.debug("Geting module tiles: now: %s, last_update %s, interval: %s", now, self.last_update, self.update_interval)
+            if self.last_update is None or now > self.last_update + self.update_interval:
+                _LOGGER.debug("Updating module zones cache..." + module_udid)
+                result = await self.get_module_data(module_udid)
+                tiles = result["tiles"]
+                tiles = list(filter(lambda e: e['tiles']['visibility'], tiles))
+                for tile in tiles:
+                    self.tiles[tile["id"] = tile
+                self.last_update = now
+        return self.tiles
+    
     async def get_module_zones(self, module_udid):
         """Returns Tech module zones either from cache or it will
         update all the cached values for Tech module assuming
