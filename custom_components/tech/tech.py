@@ -101,7 +101,7 @@ class Tech:
                 tiles = result["tiles"]
                 tiles = list(filter(lambda e: e['tiles']['visibility'], tiles))
                 for tile in tiles:
-                    self.tiles[tile["id"] = tile
+                    self.tiles[tile["id"]] = tile
                 self.last_update = now
         return self.tiles
     
