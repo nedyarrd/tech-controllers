@@ -19,14 +19,15 @@ async def async_setup_entry(
     _LOGGER.debug("Setting up sensor entry, module udid: %s", config_entry.data["udid"])
     api = hass.data[DOMAIN][config_entry.entry_id]
     zones = await api.get_module_zones(config_entry.data["udid"])
+    tiles = await api.get_module_tiles(config_entry.data["udid"])
 
     battery_devices = map_to_battery_sensors(zones, api, config_entry)
     temperature_sensors = map_to_temperature_sensors(zones, api, config_entry)
     humidity_sensors = map_to_humidity_sensors(zones, api, config_entry)
-
+    tile_sensors = map_to_tile_sensors(tiles,api,config_entry)
 
     async_add_entities(
-        itertools.chain(battery_devices, temperature_sensors,humidity_sensors),
+        itertools.chain(battery_devices, temperature_sensors,humidity_sensors,tile_sensors),
         True,
     )
 
@@ -38,12 +39,14 @@ def is_battery_operating_device(device) -> bool:
     return device['zone']['batteryLevel'] is not None
 
 def map_to_temperature_sensors(zones, api, config_entry):
-    devices = filter(lambda deviceIndex: is_humidity_operating_device(zones[deviceIndex]), zones)
     return map(lambda deviceIndex: TechTemperatureSensor(zones[deviceIndex], api, config_entry), zones)
 
 def map_to_humidity_sensors(zones, api, config_entry):
     devices = filter(lambda deviceIndex: is_humidity_operating_device(zones[deviceIndex]), zones)
     return map(lambda deviceIndex: TechHumiditySensor(zones[deviceIndex], api, config_entry), devices)
+
+def map_to_tile_sensors(tiles,api,config_entry):
+    return
 
 def is_humidity_operating_device(device) -> bool:
     return device['zone']['humidity'] != 0
