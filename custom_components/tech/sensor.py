@@ -138,7 +138,7 @@ class TechTemperatureSensor(SensorEntity):
         device = await self._api.get_zone(self._config_entry.data["udid"], self._id)
         self.update_properties(device)
 
- class TechOutsideTemperatureSensor(SensorEntity):
+class TechOutsideTemperatureSensor(SensorEntity):
     """Representation of a Tech tile temperature sensor."""
 
     _attr_native_unit_of_measurement = TEMP_CELSIUS
