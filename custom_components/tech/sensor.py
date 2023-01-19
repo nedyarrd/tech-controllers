@@ -46,7 +46,11 @@ def map_to_humidity_sensors(zones, api, config_entry):
     return map(lambda deviceIndex: TechHumiditySensor(zones[deviceIndex], api, config_entry), devices)
 
 def map_to_tile_sensors(tiles,api,config_entry):
-    return
+    devices = filter(lambda deviceIndex: is_temperature_tile(tiles[deviceIndex]),tiles)
+    return map(lambda deviceIndex: TechOutsideTemperatureSensor(tiles[deviceIndex],api,config_entry),tiles)
+
+def is_temperature_tile(device) -> bool:
+    return device['params']['txtId'] == 795;
 
 def is_humidity_operating_device(device) -> bool:
     return device['zone']['humidity'] != 0
@@ -134,6 +138,50 @@ class TechTemperatureSensor(SensorEntity):
         device = await self._api.get_zone(self._config_entry.data["udid"], self._id)
         self.update_properties(device)
 
+ class TechOutsideTemperatureSensor(SensorEntity):
+    """Representation of a Tech tile temperature sensor."""
+
+    _attr_native_unit_of_measurement = TEMP_CELSIUS
+    _attr_device_class = SensorDeviceClass.TEMPERATURE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(self, device, api, config_entry):
+        """Initialize the Tech temperature sensor."""
+        _LOGGER.debug("Init TechOutsideTemperatureSensor... ")
+        self._config_entry = config_entry
+        self._api = api
+        self._id = device["id"]
+        self.update_properties(device)
+
+    def update_properties(self, device):
+        self._name = device["params"]["description"]
+        if device["params"]["value"] is not None:
+            self._attr_native_value =  device["params"]["value"] / 10
+        else:
+            self._attr_native_value = None
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique ID."""
+        return "climate_{}_temperature".format(self._id)
+
+    @property
+    def name(self):
+        """Return the name of the device."""
+        return "{} temperature".format(self._name)
+
+    async def async_update(self):
+        """Call by the Tech device callback to update state."""
+        _LOGGER.debug(
+            "Updating Tech temp. sensor: %s, udid: %s, id: %s",
+            self._name,
+            self._config_entry.data["udid"],
+            self._id,
+        )
+        device = await self._api.get_tile(self._config_entry.data["udid"], self._id)
+        self.update_properties(device)
+       
+ 
 class TechHumiditySensor(SensorEntity):
     """Representation of a Tech humidity sensor."""
     
