@@ -39,21 +39,29 @@ def is_battery_operating_device(device) -> bool:
     return device['zone']['batteryLevel'] is not None
 
 def map_to_temperature_sensors(zones, api, config_entry):
+    devices = filter(lambda deviceIndex: is_humidity_operating_device(zones[deviceIndex]), zones)
     return map(lambda deviceIndex: TechTemperatureSensor(zones[deviceIndex], api, config_entry), zones)
 
 def map_to_humidity_sensors(zones, api, config_entry):
     devices = filter(lambda deviceIndex: is_humidity_operating_device(zones[deviceIndex]), zones)
     return map(lambda deviceIndex: TechHumiditySensor(zones[deviceIndex], api, config_entry), devices)
 
-def map_to_tile_sensors(tiles,api,config_entry):
-    devices = filter(lambda deviceIndex: is_temperature_tile(tiles[deviceIndex]),tiles)
-    return map(lambda deviceIndex: TechOutsideTemperatureSensor(tiles[deviceIndex],api,config_entry),tiles)
-
-def is_temperature_tile(device) -> bool:
-    return device['params']['txtId'] == 795;
-
 def is_humidity_operating_device(device) -> bool:
     return device['zone']['humidity'] != 0
+
+
+def map_to_tile_sensors(tiles, api, config_entry):
+    devices_outside_temperature = filter(lambda deviceIndex: is_outside_temperature_tile(tiles[deviceIndex]), tiles)
+    """ devices_relay = filter(lambda deviceIndex: is_relay_tile(tiles[deviceIndex]), tiles) """
+    devices_objects = map(lambda deviceIndex: TechOutsideTempTile(tiles[deviceIndex],api,config_entry),devices_outside_temperature)
+    """ devices_objects += map(lambda deviceIndex: TechRelayTile(tiles[deviceIndex],api,config_entry),devices_relay) """
+    """ map(lambda deviceIndex: TechHumiditySensor(zones[deviceIndex], api, config_entry), devices) """
+    return devices_objects
+
+def is_outside_temperature_tile(device) -> bool:
+    return device['params']['description'] == "Temperature sensor"
+
+
 
 class TechBatterySensor(SensorEntity):
     """Representation of a Tech battery sensor."""
@@ -138,8 +146,9 @@ class TechTemperatureSensor(SensorEntity):
         device = await self._api.get_zone(self._config_entry.data["udid"], self._id)
         self.update_properties(device)
 
-class TechOutsideTemperatureSensor(SensorEntity):
-    """Representation of a Tech tile temperature sensor."""
+
+class TechOutsideTempTile(SensorEntity):
+    """Representation of a Tech outside temperature tile sensor."""
 
     _attr_native_unit_of_measurement = TEMP_CELSIUS
     _attr_device_class = SensorDeviceClass.TEMPERATURE
@@ -147,14 +156,15 @@ class TechOutsideTemperatureSensor(SensorEntity):
 
     def __init__(self, device, api, config_entry):
         """Initialize the Tech temperature sensor."""
-        _LOGGER.debug("Init TechOutsideTemperatureSensor... ")
+        _LOGGER.debug("Init TechOutsideTemperatureTile... ")
         self._config_entry = config_entry
         self._api = api
         self._id = device["id"]
         self.update_properties(device)
+        _LOGGER.debug("Init TechOutsideTemperatureTile...: %s, udid: %s, id: %s",self._name,self._config_entry.data["udid"],self._id)
 
     def update_properties(self, device):
-        self._name = device["params"]["description"]
+        self._name = "outside_"+str(device["id"])
         if device["params"]["value"] is not None:
             self._attr_native_value =  device["params"]["value"] / 10
         else:
@@ -163,7 +173,7 @@ class TechOutsideTemperatureSensor(SensorEntity):
     @property
     def unique_id(self) -> str:
         """Return a unique ID."""
-        return "climate_{}_temperature".format(self._id)
+        return "climate_{}_out_temperature".format(self._id)
 
     @property
     def name(self):
@@ -173,18 +183,17 @@ class TechOutsideTemperatureSensor(SensorEntity):
     async def async_update(self):
         """Call by the Tech device callback to update state."""
         _LOGGER.debug(
-            "Updating Tech temp. sensor: %s, udid: %s, id: %s",
+            "Updating Tech outs. temp. tile sensor: %s, udid: %s, id: %s",
             self._name,
             self._config_entry.data["udid"],
             self._id,
         )
         device = await self._api.get_tile(self._config_entry.data["udid"], self._id)
         self.update_properties(device)
-       
- 
+
 class TechHumiditySensor(SensorEntity):
     """Representation of a Tech humidity sensor."""
-    
+
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_device_class = SensorDeviceClass.HUMIDITY
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -224,4 +233,3 @@ class TechHumiditySensor(SensorEntity):
         )
         device = await self._api.get_zone(self._config_entry.data["udid"], self._id)
         self.update_properties(device)
-
