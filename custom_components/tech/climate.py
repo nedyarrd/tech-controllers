@@ -77,8 +77,12 @@ class TechThermostat(ClimateEntity):
             self._humidity = None
     
         state = device["zone"]["flags"]["relayState"]
+        hvac_mode = device["zone"]["flags"]["algorithm"]
         if state == "on":
-            self._state = CURRENT_HVAC_HEAT
+            if hvac_mode == "heating":
+                self._state = CURRENT_HVAC_HEAT
+            elif hvac_mode == "cooling"
+                self._state = CURRENT_HVAC_COOL
         elif state == "off":
             self._state = CURRENT_HVAC_IDLE
         else:
