@@ -47,6 +47,8 @@ class TechThermostat(ClimateEntity):
         self._config_entry = config_entry
         self._api = api
         self._id = device["zone"]["id"]
+        self.device_name = "tech"
+        self.manufacturer = "TechControlers"
         self.update_properties(device)
 
     def update_properties(self, device):
