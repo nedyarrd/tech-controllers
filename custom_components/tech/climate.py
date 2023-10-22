@@ -17,7 +17,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORT_HVAC = [HVAC_MODE_HEAT, HVAC_MODE_OFF]
+SUPPORT_HVAC = [HVAC_MODE_HEAT, HVAC_MODE_COOL, HVAC_MODE_OFF]
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up entry."""
@@ -62,7 +62,6 @@ class TechThermostat(ClimateEntity):
 
         if device["zone"]["humidity"] is not None:
             self._humidity =  device["zone"]["humidity"]
-            _LOGGER.debug("Tech THermostat found humidity: %d",self._humidity)
         else:
             self._humidity = None
     
