@@ -81,7 +81,7 @@ class TechThermostat(ClimateEntity):
         if state == "on":
             if hvac_mode == "heating":
                 self._state = CURRENT_HVAC_HEAT
-            elif hvac_mode == "cooling"
+            elif hvac_mode == "cooling":
                 self._state = CURRENT_HVAC_COOL
         elif state == "off":
             self._state = CURRENT_HVAC_IDLE
