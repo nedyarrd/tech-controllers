@@ -51,13 +51,9 @@ class TechThermostat(ClimateEntity):
         self.manufacturer = "TechControlers"
         self.update_properties(device)
 
-    def device_info(self) -> DeviceInfo:
-        """Return the device info."""
-        return DeviceInfo(
-            identifiers={
-                # Serial numbers are unique identifiers within a specific domain
-                (DOMAIN, self._id)
-            },
+    def device_info(self):
+        return (
+            identifiers={(DOMAIN, self._id)},
             name="TechControllers",
             manufacturer="Tech",
         )
