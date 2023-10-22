@@ -54,10 +54,11 @@ class TechThermostat(ClimateEntity):
     @property
     def device_info(self):
         return {
-            "identifiers": {(DOMAIN, self._id)},
-            "name": "TechControllers",
-            "manufacturer": "Tech",
+            "identifiers": {(DOMAIN, self.id)},
+            "name": "tech",
+            "manufacturer": "TechControlers",
         }
+
     
     def update_properties(self, device):
         self._name = device["description"]["name"]
