@@ -3,13 +3,13 @@ import logging
 from typing import List, Optional
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
-    HVAC_MODE_HEAT,
-    HVAC_MODE_COOL,
-    HVAC_MODE_OFF,
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_COOL,
-    CURRENT_HVAC_IDLE,
-    CURRENT_HVAC_OFF,
+    HVACMode.HEAT,
+    HVACMode.COOL,
+    HVACMode.OFF,
+    HVACAction.HEATING,
+    HVACAction.COOLING,
+    HVACAction.IDLE,
+    HVACAction.OFF,
     TARGET_TEMPERATURE
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
@@ -17,7 +17,7 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-SUPPORT_HVAC = [HVAC_MODE_HEAT, HVAC_MODE_COOL, HVAC_MODE_OFF]
+SUPPORT_HVAC = [HVACMode.HEAT, HVACMode.COOL, HVACMode.OFF]
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
     """Set up entry."""
@@ -80,13 +80,13 @@ class TechThermostat(ClimateEntity):
         hvac_mode = device["zone"]["flags"]["algorithm"]
         if state == "on":
             if hvac_mode == "heating":
-                self._state = CURRENT_HVAC_HEAT
+                self._state = HVACAction.HEATING
             elif hvac_mode == "cooling":
-                self._state = CURRENT_HVAC_COOL
+                self._state = HVACAction.COOLING
         elif state == "off":
-            self._state = CURRENT_HVAC_IDLE
+            self._state = HVACAction.IDLE
         else:
-            self._state = CURRENT_HVAC_OFF
+            self._state = HVACAction.OFF
         mode = device["zone"]["zoneState"]
         if mode == "zoneOn" or mode == "noAlarm":
             self._mode = HVAC_MODE_HEAT
@@ -106,7 +106,7 @@ class TechThermostat(ClimateEntity):
     @property
     def supported_features(self):
         """Return the list of supported features."""
-        return TARGET_TEMPERATURE #| SUPPORT_PRESET_MODE
+        return TARGET_TEMPERATURE #| PRESET_MODE
 
     @property
     def hvac_mode(self):
