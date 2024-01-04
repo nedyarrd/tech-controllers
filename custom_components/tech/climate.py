@@ -3,14 +3,9 @@ import logging
 from typing import List, Optional
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
-    HVACMode.HEAT,
-    HVACMode.COOL,
-    HVACMode.OFF,
-    HVACAction.HEATING,
-    HVACAction.COOLING,
-    HVACAction.IDLE,
-    HVACAction.OFF,
-    ClimateEntityFeature.TARGET_TEMPERATURE
+    HVACMode,
+    HVACAction,
+    ClimateEntityFeature
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from .const import DOMAIN
