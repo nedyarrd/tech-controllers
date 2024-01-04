@@ -101,7 +101,7 @@ class TechThermostat(ClimateEntity):
     @property
     def supported_features(self):
         """Return the list of supported features."""
-        return TARGET_TEMPERATURE #| PRESET_MODE
+        return ClimateEntityFeature.TARGET_TEMPERATURE #| ClimateEntityFeature.PRESET_MODE
 
     @property
     def hvac_mode(self):
