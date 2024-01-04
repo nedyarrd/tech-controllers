@@ -84,9 +84,9 @@ class TechThermostat(ClimateEntity):
             self._state = HVACAction.OFF
         mode = device["zone"]["zoneState"]
         if mode == "zoneOn" or mode == "noAlarm":
-            self._mode = HVAC_MODE_HEAT
+            self._mode = HVACMode.HEAT
         else:
-            self._mode = HVAC_MODE_OFF
+            self._mode = HVACMode.OFF
 
     @property
     def unique_id(self) -> str:
@@ -164,8 +164,8 @@ class TechThermostat(ClimateEntity):
     async def async_set_hvac_mode(self, hvac_mode):
         """Set new target hvac mode."""
         _LOGGER.debug("%s: Setting hvac mode to %s", self._name, hvac_mode)
-        if hvac_mode == HVAC_MODE_OFF:
+        if hvac_mode == HVACMode.OFF:
             await self._api.set_zone(self._config_entry.data["udid"], self._id, False)
-        elif hvac_mode == HVAC_MODE_HEAT:
+        elif hvac_mode == HVACMode.HEAT:
             await self._api.set_zone(self._config_entry.data["udid"], self._id, True)
 
