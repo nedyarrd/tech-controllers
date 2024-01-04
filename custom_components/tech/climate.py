@@ -10,7 +10,7 @@ from homeassistant.components.climate.const import (
     HVACAction.COOLING,
     HVACAction.IDLE,
     HVACAction.OFF,
-    TARGET_TEMPERATURE
+    ClimateEntityFeature.TARGET_TEMPERATURE
 )
 from homeassistant.const import ATTR_TEMPERATURE, TEMP_CELSIUS
 from .const import DOMAIN
